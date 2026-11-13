@@ -13,7 +13,7 @@ concurrency:
 
 env:
   OPENCLAW_VERSION: "2026.3.2"
-  NODE_VERSION: "22.16.0"
+  NODE_VERSION: "22"
 
 jobs:
   e2e:
@@ -31,13 +31,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      # npm 10.8.2 installs this dependency graph reliably on the E2E runners.
-      # Keep the supported Node 22 runtime for OpenClaw (requires >=22.12).
-      - name: Pin npm for reproducible dependency installation
-        run: |
-          npm install --global npm@10.8.2
-          npm --version
 
       - uses: actions/setup-python@v5
         with:
