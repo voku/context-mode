@@ -36,6 +36,8 @@ echo ""
 echo "=== Output Size ==="
 wc -l < "$OUTPUT_FILE" | xargs -I{} echo "{} total lines of output"
 
+# Return the wrapped command status after printing the diagnostic summary.
+exit "$EXIT_CODE"
 ```
 > summary_prompt: "Report build success/failure, list all errors with file paths, and count warnings"
 > timeout_ms: 120000
@@ -69,6 +71,8 @@ if [ "$TOTAL_ERRORS" -gt 0 ]; then
 fi
 
 
+# Return the wrapped command status after printing the diagnostic summary.
+exit "$EXIT_CODE"
 ```
 > summary_prompt: "Report type error count, most common error codes, and most affected files"
 > timeout_ms: 60000
@@ -101,6 +105,8 @@ echo "=== Slow Tests (if reported) ==="
 grep -i 'slow' "$OUTPUT_FILE" | head -10
 
 
+# Return the wrapped command status after printing the diagnostic summary.
+exit "$EXIT_CODE"
 ```
 > summary_prompt: "Report pass/fail ratio, list all failing test names with suite, note any slow tests"
 > timeout_ms: 120000
@@ -125,6 +131,8 @@ echo "=== Failures ==="
 grep -E '(FAILED|ERROR)' "$OUTPUT_FILE" | head -30
 
 
+# Return the wrapped command status after printing the diagnostic summary.
+exit "$EXIT_CODE"
 ```
 > summary_prompt: "Report test results, list all failures with file and test name"
 > timeout_ms: 120000
