@@ -10,7 +10,9 @@ Best for piping, filtering, and leveraging native OS tools.
 ### Capture build errors only
 
 ```shell
-npm run build 2>&1 | tee /tmp/build-output.txt
+OUTPUT_FILE="$(mktemp)" || exit 1
+trap 'rm -- "$OUTPUT_FILE"' EXIT
+npm run build 2>&1 | tee "$OUTPUT_FILE"
 EXIT_CODE=${PIPESTATUS[0]}
 
 echo "=== Build Result ==="
@@ -19,21 +21,21 @@ echo "Exit code: $EXIT_CODE"
 if [ "$EXIT_CODE" -ne 0 ]; then
   echo ""
   echo "=== Errors ==="
-  grep -iE '(error|failed|FAIL)' /tmp/build-output.txt | head -50
+  grep -iE '(error|failed|FAIL)' "$OUTPUT_FILE" | head -50
   echo ""
   echo "=== Warnings ==="
-  grep -iE '(warning|warn)' /tmp/build-output.txt | head -20
+  grep -iE '(warning|warn)' "$OUTPUT_FILE" | head -20
 else
   echo "Build succeeded."
   echo ""
   echo "=== Warnings (if any) ==="
-  grep -iE '(warning|warn)' /tmp/build-output.txt | head -10
+  grep -iE '(warning|warn)' "$OUTPUT_FILE" | head -10
 fi
 
 echo ""
 echo "=== Output Size ==="
-wc -l < /tmp/build-output.txt | xargs -I{} echo "{} total lines of output"
-rm -f /tmp/build-output.txt
+wc -l < "$OUTPUT_FILE" | xargs -I{} echo "{} total lines of output"
+
 ```
 > summary_prompt: "Report build success/failure, list all errors with file paths, and count warnings"
 > timeout_ms: 120000
@@ -41,30 +43,32 @@ rm -f /tmp/build-output.txt
 ### TypeScript compilation check
 
 ```shell
-npx tsc --noEmit 2>&1 | tee /tmp/tsc-output.txt
+OUTPUT_FILE="$(mktemp)" || exit 1
+trap 'rm -- "$OUTPUT_FILE"' EXIT
+npx tsc --noEmit 2>&1 | tee "$OUTPUT_FILE"
 EXIT_CODE=${PIPESTATUS[0]}
 
 echo "=== TypeScript Check ==="
 echo "Exit code: $EXIT_CODE"
 
-TOTAL_ERRORS=$(grep -c 'error TS' /tmp/tsc-output.txt 2>/dev/null || echo 0)
+TOTAL_ERRORS=$(grep -c 'error TS' "$OUTPUT_FILE" 2>/dev/null || echo 0)
 echo "Total errors: $TOTAL_ERRORS"
 
 if [ "$TOTAL_ERRORS" -gt 0 ]; then
   echo ""
   echo "=== Errors by Code ==="
-  grep -oP 'error TS\d+' /tmp/tsc-output.txt | sort | uniq -c | sort -rn | head -20
+  grep -oP 'error TS\d+' "$OUTPUT_FILE" | sort | uniq -c | sort -rn | head -20
 
   echo ""
   echo "=== Errors by File ==="
-  grep 'error TS' /tmp/tsc-output.txt | cut -d'(' -f1 | sort | uniq -c | sort -rn | head -20
+  grep 'error TS' "$OUTPUT_FILE" | cut -d'(' -f1 | sort | uniq -c | sort -rn | head -20
 
   echo ""
   echo "=== First 30 Errors ==="
-  grep 'error TS' /tmp/tsc-output.txt | head -30
+  grep 'error TS' "$OUTPUT_FILE" | head -30
 fi
 
-rm -f /tmp/tsc-output.txt
+
 ```
 > summary_prompt: "Report type error count, most common error codes, and most affected files"
 > timeout_ms: 60000
@@ -76,7 +80,9 @@ rm -f /tmp/tsc-output.txt
 ### Jest test summary
 
 ```shell
-npx jest --verbose 2>&1 | tee /tmp/test-output.txt
+OUTPUT_FILE="$(mktemp)" || exit 1
+trap 'rm -- "$OUTPUT_FILE"' EXIT
+npx jest --verbose 2>&1 | tee "$OUTPUT_FILE"
 EXIT_CODE=${PIPESTATUS[0]}
 
 echo ""
@@ -84,17 +90,17 @@ echo "=== Test Summary ==="
 echo "Exit code: $EXIT_CODE"
 
 # Extract summary line
-grep -E '(Tests:|Test Suites:|Snapshots:|Time:)' /tmp/test-output.txt
+grep -E '(Tests:|Test Suites:|Snapshots:|Time:)' "$OUTPUT_FILE"
 
 echo ""
 echo "=== Failed Tests ==="
-grep -A 2 'FAIL ' /tmp/test-output.txt | head -40
+grep -A 2 'FAIL ' "$OUTPUT_FILE" | head -40
 
 echo ""
 echo "=== Slow Tests (if reported) ==="
-grep -i 'slow' /tmp/test-output.txt | head -10
+grep -i 'slow' "$OUTPUT_FILE" | head -10
 
-rm -f /tmp/test-output.txt
+
 ```
 > summary_prompt: "Report pass/fail ratio, list all failing test names with suite, note any slow tests"
 > timeout_ms: 120000
@@ -102,7 +108,9 @@ rm -f /tmp/test-output.txt
 ### Pytest summary
 
 ```shell
-python -m pytest --tb=short -q 2>&1 | tee /tmp/pytest-output.txt
+OUTPUT_FILE="$(mktemp)" || exit 1
+trap 'rm -- "$OUTPUT_FILE"' EXIT
+python -m pytest --tb=short -q 2>&1 | tee "$OUTPUT_FILE"
 EXIT_CODE=${PIPESTATUS[0]}
 
 echo ""
@@ -110,13 +118,13 @@ echo "=== Pytest Summary ==="
 echo "Exit code: $EXIT_CODE"
 
 # Last 20 lines usually contain the summary
-tail -20 /tmp/pytest-output.txt
+tail -20 "$OUTPUT_FILE"
 
 echo ""
 echo "=== Failures ==="
-grep -E '(FAILED|ERROR)' /tmp/pytest-output.txt | head -30
+grep -E '(FAILED|ERROR)' "$OUTPUT_FILE" | head -30
 
-rm -f /tmp/pytest-output.txt
+
 ```
 > summary_prompt: "Report test results, list all failures with file and test name"
 > timeout_ms: 120000
