@@ -5,6 +5,8 @@ description: |
   plugin registration, npm and marketplace versions.
   Trigger: /context-mode:ctx-doctor
 user-invocable: true
+metadata:
+  author: Mert Koseoğlu <mksglu@users.noreply.github.com>
 ---
 
 # Context Mode Doctor

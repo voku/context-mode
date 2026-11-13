@@ -7,6 +7,8 @@ description: |
   First run installs dependencies (~30s). Subsequent runs open instantly.
   Trigger: /context-mode:ctx-insight
 user-invocable: true
+metadata:
+  author: Mert Koseoğlu <mksglu@users.noreply.github.com>
 ---
 
 # Context Mode Insight
