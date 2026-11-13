@@ -51,13 +51,13 @@ EXIT_CODE=${PIPESTATUS[0]}
 echo "=== TypeScript Check ==="
 echo "Exit code: $EXIT_CODE"
 
-TOTAL_ERRORS=$(grep -c 'error TS' "$OUTPUT_FILE" 2>/dev/null || echo 0)
+TOTAL_ERRORS=$(awk '/error TS/ { count++ } END { print count+0 }' "$OUTPUT_FILE")
 echo "Total errors: $TOTAL_ERRORS"
 
 if [ "$TOTAL_ERRORS" -gt 0 ]; then
   echo ""
   echo "=== Errors by Code ==="
-  grep -oP 'error TS\d+' "$OUTPUT_FILE" | sort | uniq -c | sort -rn | head -20
+  grep -oE 'error TS[0-9]+' "$OUTPUT_FILE" | sort | uniq -c | sort -rn | head -20
 
   echo ""
   echo "=== Errors by File ==="
