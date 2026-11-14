@@ -5,6 +5,8 @@ description: |
   and resets session stats. This is destructive and cannot be undone.
   Trigger: /context-mode:ctx-purge
 user-invocable: true
+metadata:
+  author: Mert Koseoğlu <mksglu@users.noreply.github.com>
 ---
 
 # Context Mode Purge

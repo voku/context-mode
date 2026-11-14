@@ -5,6 +5,8 @@ description: |
   Pulls latest, builds, installs, updates npm global, configures hooks.
   Trigger: /context-mode:ctx-upgrade
 user-invocable: true
+metadata:
+  author: Mert Koseoğlu <mksglu@users.noreply.github.com>
 ---
 
 # Context Mode Upgrade

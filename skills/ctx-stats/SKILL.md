@@ -7,6 +7,8 @@ description: |
   To wipe the knowledge base entirely, use ctx_purge instead.
   Trigger: /context-mode:ctx-stats
 user-invocable: true
+metadata:
+  author: Mert Koseoğlu <mksglu@users.noreply.github.com>
 ---
 
 # Context Mode Stats

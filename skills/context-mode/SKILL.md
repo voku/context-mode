@@ -15,6 +15,8 @@ description: |
   "outdated packages", "dependency tree", "cloud resources", "CI/CD output".
   Also triggers on ANY MCP tool output that may exceed 20 lines.
   Subagent routing is handled automatically via PreToolUse hook.
+metadata:
+  author: Mert Koseoğlu <mksglu@users.noreply.github.com>
 ---
 
 # Context Mode: Default for All Large Output
